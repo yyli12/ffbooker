@@ -4,15 +4,16 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"ffbooker/log"
 	"fmt"
-	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 	"syscall"
+
+	"github.com/yyli12/ffbooker/log"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (

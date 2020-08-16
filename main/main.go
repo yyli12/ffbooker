@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ffbooker/booker"
+	"github.com/yyli12/ffbooker/booker"
 )
 
 func main() {

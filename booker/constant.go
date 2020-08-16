@@ -2,9 +2,6 @@ package booker
 
 const (
 	tokenFile = "./ffbookertoken"
-
-	ClubIDBugis = 21
-	ClubIDDBG   = 7
 )
 
 var (
