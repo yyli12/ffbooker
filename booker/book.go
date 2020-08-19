@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -12,10 +13,11 @@ import (
 
 const (
 	maxSearchPage                = 3
-	maxTryBookingTime            = 1000
+	maxTryBookingTime            = 10000
 	defaultSearchClassInterval   = 300 * time.Millisecond
 	defaultBookingInterval       = 1 * time.Second
-	regularCheckInterval         = 5 * time.Second
+	regularCheckIntervalMin      = 2 * time.Second
+	regularCheckIntervalDelta    = 3 * time.Second
 	concurrentBookingThreshold   = 5 * time.Second
 	longBookingIntervalThreshold = 2 * time.Minute
 	shortBookingInterval         = 20 * time.Second
@@ -62,11 +64,15 @@ func BookGymFloor(clubID int, slotTime *time.Time) error {
 			booking = class.Booking
 			continue
 		}
+		if class.TimeStart < time.Now().Unix() {
+			log.Error("class started")
+			break
+		}
 
 		// capacity > 0: can try to book
 		if class.Capacity > 0 {
 			bookingError := error(nil)
-			booking, bookingError = bookGymFloot(class, bookingMode)
+			booking, bookingError = bookGymFloor(class, bookingMode)
 			if booking != nil {
 				break
 			}
@@ -97,10 +103,13 @@ func BookGymFloor(clubID int, slotTime *time.Time) error {
 						}
 					}
 				}
+			} else {
+				log.Error("booking error", bookingError)
 			}
 		} else {
 			// low want fish - try to book canceled slots
-			log.Warn("regular booking every %s", regularCheckInterval)
+			regularCheckInterval := regularCheckIntervalMin + time.Duration(rand.Int63n(int64(regularCheckIntervalDelta)))
+			log.Warn("no slot, regular booking every %s", regularCheckInterval)
 			interval = regularCheckInterval
 		}
 		tryBookingTime++
@@ -117,7 +126,7 @@ func BookGymFloor(clubID int, slotTime *time.Time) error {
 }
 
 // todo make it booking many times in parallel
-func bookGymFloot(class *Class, mode BookingMode) (*Booking, error) {
+func bookGymFloor(class *Class, mode BookingMode) (*Booking, error) {
 	if class == nil {
 		return nil, fmt.Errorf("class is nil")
 	}
