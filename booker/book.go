@@ -13,7 +13,7 @@ import (
 
 const (
 	maxSearchPage                = 3
-	maxTryBookingTime            = 10000
+	maxTryBookingTime            = 20000
 	defaultSearchClassInterval   = 300 * time.Millisecond
 	defaultBookingInterval       = 1 * time.Second
 	regularCheckIntervalMin      = 2 * time.Second
